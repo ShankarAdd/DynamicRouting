@@ -51,10 +51,12 @@ module.exports = class Product {
   
   static deleteProductById(id){
     getProductsFromFile(products =>{
-      const deletingProduct = products.filter(prod => prod.id !== id);
-      fs.writeFile(p, JSON.stringify(deletingProduct), err =>{
-        console.log(err);
-      })
+      console.log(products);
+      const deletingProduct = products.findIndex(prod => prod.id === id);
+      // fs.writeFile(p, JSON.stringify(deletingProduct), err =>{
+      //   console.log(err);
+      // })
+      products.splice(deletingProduct,1);
     });
   }
   static fetchAll(cb) {
