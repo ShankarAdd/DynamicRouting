@@ -14,10 +14,13 @@ exports.postAddProduct = (req, res, next) => {
   const price = req.body.price;
   const description = req.body.description;
   const product = new Product(null, title, imageUrl, description, price);
-  product.save();
-  res.redirect('/');
+  product
+  .save()
+  .then(() =>{
+    res.redirect('/');
+  })
+  .catch(err =>console.log(err));
 };
-
 exports.getEditProduct = (req, res, next) => {
   //this will give true if query parameter presents if not it will be undefined which means false
   const editMode = req.query.edit;
@@ -25,18 +28,14 @@ exports.getEditProduct = (req, res, next) => {
     return res.redirect('/');
   }
   const proId=req.params.productId;
-  Product.findById(proId,product =>{
-    if(!product){
-      return res.redirect('/');
-    }
+  Product.findById(proId).then(([rows,fieldData])=>{
     res.render('admin/edit-product', {
-      pageTitle: 'Add Product',
-      path: '/admin/add-product',
-      editing: editMode,
-      product: product
+      pageTitle: 'Edit Product',
+      path: '/admin/edit-product',
+      editing:editMode,
+      product:rows[0]
     });
-    
-  });
+  }).catch(err=>console.log(err))
 };
 
 exports.postEditProduct = (req,res,next) =>{
@@ -50,6 +49,8 @@ exports.postEditProduct = (req,res,next) =>{
   res.redirect('/admin/products')
 }
 
+
+
 exports.getProducts = (req, res, next) => {
   Product.fetchAll(products => {
     res.render('admin/products', {
@@ -61,12 +62,7 @@ exports.getProducts = (req, res, next) => {
 };
 
 exports.deleteProductById = (req,res,next) =>{
-  const prodId=req.body.productId;
-  // const title = req.body.title;
-  // const imageUrl = req.body.imageUrl;
-  // const price = req.body.price;
-  // const description = req.body.description;
-  // const updatedProduct = new Product(prodId,title,imageUrl,price,description);
-  Product.deleteProductById(prodId);
-  res.redirect('/admin/products')
+  const prod = req.params.productId;
+  Product.deleteProduct(prod);
+  res.redirect('/products');
 }
